@@ -3,7 +3,7 @@
  * Plugin Name:       Karuna Booking Search
  * Plugin URI:        https://github.com/ledorofficial/karuna-booking-search
  * Description:        Branded availability search (replaces the Smoobu widget). A compact one-month calendar with live nightly prices and sold-out nights greyed out, pulled from bookings.karunasiargao.com, then sends the search there. Use [karuna_booking_search] or the "Karuna Booking Search" widget.
- * Version:           1.5.1
+ * Version:           1.6.0
  * Author:            Karuna Siargao
  * License:           GPL-2.0-or-later
  * Text Domain:       karuna-booking-search
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const KBS_VERSION      = '1.5.1';
+const KBS_VERSION      = '1.6.0';
 const KBS_FLATPICKR    = '4.6.13';
 const KBS_DEFAULT_BASE = 'https://bookings.karunasiargao.com/';
 const KBS_CALENDAR_API = 'https://bookings.karunasiargao.com/api/calendar';

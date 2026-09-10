@@ -295,7 +295,8 @@
     var showPrices = form.getAttribute('data-kbs-prices') !== 'off';
 
     form.addEventListener('submit', function (e) {
-      if (!arrival.value || !departure.value) {
+      // Need both dates, and at least one night (check-out after check-in).
+      if (!arrival.value || !departure.value || departure.value <= arrival.value) {
         e.preventDefault();
         checkin.classList.add('kbs-invalid');
         return;
@@ -378,6 +379,12 @@
         plugins: [ new window.rangePlugin({ input: checkout }) ],
         disable: [ blockUnavailable ],
         onChange: function (dates, str, fp) {
+          // Reject a same-day range: drop back to just the check-in so the
+          // guest has to pick a later check-out (>= 1 night).
+          if (dates.length === 2 && sameDay(dates[0], dates[1])) {
+            fp.setDate([dates[0]], false); // false = don't re-fire onChange
+            dates = [dates[0]];
+          }
           sync(dates); syncDisable(fp, dates);
           checkin.classList.remove('kbs-invalid');
         },
