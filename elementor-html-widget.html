@@ -131,7 +131,7 @@
 .kbs-guests[open] > summary{outline:2px solid var(--kbs-brown);outline-offset:1px;border-color:var(--kbs-brown);}
 .kbs-guests-pop{
   position:absolute;z-index:99998;left:0;right:0;margin-top:8px;padding:6px 14px;
-  background:#fff;border:1px solid rgba(0,51,61,.12);border-radius:14px;
+  background:#fff;color:var(--kbs-ink);border:1px solid rgba(0,51,61,.12);border-radius:14px;
   box-shadow:0 16px 40px -12px rgba(0,51,61,.35);
 }
 .kbs-widget--inline .kbs-guests-pop{right:auto;min-width:230px;}
@@ -140,13 +140,13 @@
 .kbs-guests-row > span:first-child{font-size:14px;font-weight:500;color:var(--kbs-ink);}
 .kbs-stepper{display:flex;align-items:center;gap:10px;}
 .kbs-stepper button{
-  width:32px;height:32px;flex:none;border-radius:999px;border:1px solid rgba(0,51,61,.25);
-  background:#fff;color:var(--kbs-ink);font:inherit;font-size:17px;line-height:1;cursor:pointer;
+  width:32px;height:32px;flex:none;border-radius:999px;border:1px solid rgba(0,51,61,.4);
+  background:#fff;color:var(--kbs-ink);font:inherit;font-size:18px;line-height:1;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:border-color .12s,color .12s;
 }
 .kbs-stepper button:hover:not(:disabled){border-color:var(--kbs-brown);color:var(--kbs-brown);}
-.kbs-stepper button:disabled{opacity:.35;cursor:not-allowed;}
-.kbs-stepper > span{min-width:16px;text-align:center;font-size:14px;font-variant-numeric:tabular-nums;}
+.kbs-stepper button:disabled{opacity:.3;cursor:not-allowed;}
+.kbs-stepper > span{min-width:16px;text-align:center;font-size:15px;font-weight:600;color:var(--kbs-ink);font-variant-numeric:tabular-nums;}
 
 /* ---- flatpickr calendar: one month, compact, always fits ---- */
 .flatpickr-calendar.kbs-fp{
