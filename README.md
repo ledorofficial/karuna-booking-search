@@ -35,17 +35,25 @@ Uses [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checke
 
 ## Shortcode attributes
 
-| Attribute    | Default                              | Notes                                 |
-|--------------|--------------------------------------|---------------------------------------|
-| `base`       | `https://bookings.karunasiargao.com/`| Where the search submits.              |
-| `target`     | `_self`                              | `_blank` opens results in a new tab.   |
-| `max_guests` | `16`                                 | Highest number in the People dropdown. |
-| `prices`     | `on`                                 | `off` hides the per-night prices.      |
+| Attribute    | Default                              | Notes                                             |
+|--------------|--------------------------------------|---------------------------------------------------|
+| `base`       | `https://bookings.karunasiargao.com/`| Where the search submits.                          |
+| `target`     | `_self`                              | `_blank` opens results in a new tab.               |
+| `max_guests` | `16`                                 | Highest number in the People dropdown.             |
+| `prices`     | `on`                                 | `off` hides the per-night prices.                  |
+| `layout`     | `stacked`                            | `stacked` = teal card; `inline` = light wide row.  |
+| `button`     | `Search`                             | Submit button label.                              |
 
 ```
-[karuna_booking_search max_guests="4"]     Skygazer (sleeps 4)
-[karuna_booking_search prices="off"]        calendar without prices
+[karuna_booking_search max_guests="4"]                       Skygazer (sleeps 4)
+[karuna_booking_search prices="off"]                         calendar without prices
+[karuna_booking_search layout="inline" button="Check availability"]   homepage row
 ```
+
+**Layouts:** `stacked` is the compact teal card for a sidebar (like the Smoobu
+widget). `inline` is a full-width white row — Arrival · Departure · Guests ·
+button — for a homepage hero on a light background; it wraps to two columns
+below 640px.
 
 ## Backend dependency
 

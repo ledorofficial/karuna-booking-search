@@ -10,6 +10,10 @@
     target="_blank"        open results in a new tab
     data-kbs-prices="off"  hide the per-night prices in the calendar
 
+  HOMEPAGE ROW: for the wide horizontal version on a light background, change
+    class="kbs-widget"  ->  class="kbs-widget kbs-widget--inline"
+  on the <form> below (and change the button text if you like).
+
   flatpickr is pulled from cdnjs at runtime; prices come from
   https://bookings.karunasiargao.com/api/calendar. If either is blocked the
   widget falls back to plain native date fields, so it always works.
@@ -75,7 +79,24 @@
   color:#fff;font:inherit;font-size:16px;font-weight:700;transition:background .15s ease;
 }
 .kbs-field--submit button:hover{background:var(--kbs-brown-dark);}
-@media (max-width:360px){ .kbs-widget{grid-template-columns:1fr;padding:16px;} }
+@media (max-width:360px){ .kbs-widget:not(.kbs-widget--inline){grid-template-columns:1fr;padding:16px;} }
+
+/* ---- inline layout: one horizontal row on a light background (homepage) ---- */
+.kbs-widget--inline{
+  grid-template-columns:1fr 1fr minmax(120px,auto) auto;
+  align-items:end;gap:16px;max-width:900px;
+  background:#fff;border-color:rgba(0,51,61,.08);
+  box-shadow:0 12px 34px -14px rgba(0,51,61,.28);
+}
+.kbs-widget--inline .kbs-field label{color:var(--kbs-ink);}
+.kbs-widget--inline .kbs-field input,.kbs-widget--inline .kbs-field select{border-color:rgba(0,51,61,.16);}
+.kbs-widget--inline .kbs-field--guests,.kbs-widget--inline .kbs-field--submit{grid-column:auto;}
+.kbs-widget--inline .kbs-field--submit button{width:auto;padding:0 26px;}
+@media (max-width:640px){
+  .kbs-widget--inline{grid-template-columns:1fr 1fr;}
+  .kbs-widget--inline .kbs-field--guests,.kbs-widget--inline .kbs-field--submit{grid-column:1 / -1;}
+  .kbs-widget--inline .kbs-field--submit button{width:100%;}
+}
 
 /* ---- flatpickr calendar: one month, compact, always fits ---- */
 .flatpickr-calendar.kbs-fp{

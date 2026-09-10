@@ -3,7 +3,7 @@
  * Plugin Name:       Karuna Booking Search
  * Plugin URI:        https://github.com/ledorofficial/karuna-booking-search
  * Description:        Branded availability search (replaces the Smoobu widget). A compact one-month calendar with live nightly prices and sold-out nights greyed out, pulled from bookings.karunasiargao.com, then sends the search there. Use [karuna_booking_search] or the "Karuna Booking Search" widget.
- * Version:           1.3.0
+ * Version:           1.4.0
  * Author:            Karuna Siargao
  * License:           GPL-2.0-or-later
  * Text Domain:       karuna-booking-search
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const KBS_VERSION      = '1.3.0';
+const KBS_VERSION      = '1.4.0';
 const KBS_FLATPICKR    = '4.6.13';
 const KBS_DEFAULT_BASE = 'https://bookings.karunasiargao.com/';
 const KBS_CALENDAR_API = 'https://bookings.karunasiargao.com/api/calendar';
@@ -47,20 +47,24 @@ function kbs_render_widget($atts = []): string
         'base'       => KBS_DEFAULT_BASE,
         'target'     => '_self',
         'max_guests' => 16,
-        'prices'     => 'on',   // "off" hides the per-night prices in the calendar
+        'prices'     => 'on',       // "off" hides the per-night prices in the calendar
+        'layout'     => 'stacked',  // "stacked" (teal card) or "inline" (light horizontal row)
+        'button'     => 'Search',   // submit button label
     ], $atts, 'karuna_booking_search');
 
     $base       = esc_url($atts['base']);
     $target     = $atts['target'] === '_blank' ? '_blank' : '_self';
     $max_guests = max(1, (int) $atts['max_guests']);
     $prices     = strtolower((string) $atts['prices']) === 'off' ? 'off' : 'on';
+    $layout     = strtolower((string) $atts['layout']) === 'inline' ? 'inline' : 'stacked';
+    $button     = trim((string) $atts['button']) !== '' ? trim((string) $atts['button']) : 'Search';
     $uid        = 'kbs-' . wp_generate_password(6, false, false);
 
     kbs_enqueue_assets();
 
     ob_start();
     ?>
-    <form class="kbs-widget" id="<?php echo esc_attr($uid); ?>"
+    <form class="kbs-widget kbs-widget--<?php echo esc_attr($layout); ?>" id="<?php echo esc_attr($uid); ?>"
           action="<?php echo $base; ?>" method="get"
           target="<?php echo esc_attr($target); ?>"
           data-kbs data-kbs-prices="<?php echo esc_attr($prices); ?>">
@@ -83,7 +87,7 @@ function kbs_render_widget($atts = []): string
             </select>
         </div>
         <div class="kbs-field kbs-field--submit">
-            <button type="submit">Search</button>
+            <button type="submit"><?php echo esc_html($button); ?></button>
         </div>
         <input type="hidden" name="arrival" data-kbs-arrival>
         <input type="hidden" name="departure" data-kbs-departure>
@@ -151,6 +155,8 @@ class KBS_Widget extends WP_Widget
             'target'     => !empty($instance['new_tab']) ? '_blank' : '_self',
             'max_guests' => !empty($instance['max_guests']) ? (int) $instance['max_guests'] : 16,
             'prices'     => !empty($instance['hide_prices']) ? 'off' : 'on',
+            'layout'     => ($instance['layout'] ?? 'stacked') === 'inline' ? 'inline' : 'stacked',
+            'button'     => !empty($instance['button']) ? $instance['button'] : 'Search',
         ]);
         echo $args['after_widget'];
     }
@@ -162,12 +168,28 @@ class KBS_Widget extends WP_Widget
         $max_guests  = $instance['max_guests'] ?? 16;
         $new_tab     = !empty($instance['new_tab']);
         $hide_prices = !empty($instance['hide_prices']);
+        $layout      = ($instance['layout'] ?? 'stacked') === 'inline' ? 'inline' : 'stacked';
+        $button      = $instance['button'] ?? 'Search';
         ?>
         <p>
             <label for="<?php echo esc_attr($this->get_field_id('title')); ?>">Title:</label>
             <input class="widefat" id="<?php echo esc_attr($this->get_field_id('title')); ?>"
                    name="<?php echo esc_attr($this->get_field_name('title')); ?>" type="text"
                    value="<?php echo esc_attr($title); ?>">
+        </p>
+        <p>
+            <label for="<?php echo esc_attr($this->get_field_id('layout')); ?>">Layout:</label>
+            <select class="widefat" id="<?php echo esc_attr($this->get_field_id('layout')); ?>"
+                    name="<?php echo esc_attr($this->get_field_name('layout')); ?>">
+                <option value="stacked" <?php selected($layout, 'stacked'); ?>>Stacked — teal card (Smoobu-style)</option>
+                <option value="inline" <?php selected($layout, 'inline'); ?>>Inline — light horizontal row (homepage)</option>
+            </select>
+        </p>
+        <p>
+            <label for="<?php echo esc_attr($this->get_field_id('button')); ?>">Button label:</label>
+            <input class="widefat" id="<?php echo esc_attr($this->get_field_id('button')); ?>"
+                   name="<?php echo esc_attr($this->get_field_name('button')); ?>" type="text"
+                   value="<?php echo esc_attr($button); ?>" placeholder="Search">
         </p>
         <p>
             <label for="<?php echo esc_attr($this->get_field_id('max_guests')); ?>">Max people in dropdown:</label>
@@ -196,6 +218,8 @@ class KBS_Widget extends WP_Widget
             'max_guests'  => max(1, (int) ($new['max_guests'] ?? 16)),
             'new_tab'     => !empty($new['new_tab']),
             'hide_prices' => !empty($new['hide_prices']),
+            'layout'      => ($new['layout'] ?? '') === 'inline' ? 'inline' : 'stacked',
+            'button'      => sanitize_text_field($new['button'] ?? 'Search'),
         ];
     }
 }

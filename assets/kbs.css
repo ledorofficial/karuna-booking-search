@@ -31,7 +31,27 @@
 }
 .kbs-field--submit button:hover{background:var(--kbs-brown-dark);}
 @media (max-width:360px){
-  .kbs-widget{grid-template-columns:1fr;padding:16px;}
+  .kbs-widget:not(.kbs-widget--inline){grid-template-columns:1fr;padding:16px;}
+}
+
+/* ---- inline layout: one horizontal row on a light background (homepage) ---- */
+.kbs-widget--inline{
+  grid-template-columns:1fr 1fr minmax(120px,auto) auto;
+  align-items:end;gap:16px;max-width:900px;
+  background:#fff;border-color:rgba(0,51,61,.08);
+  box-shadow:0 12px 34px -14px rgba(0,51,61,.28);
+}
+.kbs-widget--inline .kbs-field label{color:var(--kbs-ink);}
+.kbs-widget--inline .kbs-field input,
+.kbs-widget--inline .kbs-field select{border-color:rgba(0,51,61,.16);}
+.kbs-widget--inline .kbs-field--guests,
+.kbs-widget--inline .kbs-field--submit{grid-column:auto;}
+.kbs-widget--inline .kbs-field--submit button{width:auto;padding:0 26px;}
+@media (max-width:640px){
+  .kbs-widget--inline{grid-template-columns:1fr 1fr;}
+  .kbs-widget--inline .kbs-field--guests,
+  .kbs-widget--inline .kbs-field--submit{grid-column:1 / -1;}
+  .kbs-widget--inline .kbs-field--submit button{width:100%;}
 }
 
 /* ---- flatpickr calendar: one month, compact, always fits ---- */
