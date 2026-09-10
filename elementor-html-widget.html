@@ -1,0 +1,292 @@
+<!--
+  Karuna Booking Search — standalone widget (one-month calendar, mobile-safe).
+
+  Paste this ENTIRE block into an Elementor "HTML" widget or a WordPress
+  "Custom HTML" block. It shows a single-month calendar with live nightly
+  prices and sold-out nights greyed out, then sends arrival / departure /
+  guests to bookings.karunasiargao.com.
+
+  Options (edit the <form> tag):
+    target="_blank"        open results in a new tab
+    data-kbs-prices="off"  hide the per-night prices in the calendar
+
+  flatpickr is pulled from cdnjs at runtime; prices come from
+  https://bookings.karunasiargao.com/api/calendar. If either is blocked the
+  widget falls back to plain native date fields, so it always works.
+-->
+<form class="kbs-widget" action="https://bookings.karunasiargao.com/" method="get" data-kbs>
+  <div class="kbs-field kbs-field--date">
+    <label for="kbs-checkin">Arrival</label>
+    <input type="text" id="kbs-checkin" placeholder="Add date" autocomplete="off" readonly data-kbs-checkin>
+  </div>
+  <div class="kbs-field kbs-field--date">
+    <label for="kbs-checkout">Departure</label>
+    <input type="text" id="kbs-checkout" placeholder="Add date" autocomplete="off" readonly data-kbs-checkout>
+  </div>
+
+  <div class="kbs-field kbs-field--guests">
+    <label for="kbs-guests">People</label>
+    <select id="kbs-guests" name="guests">
+      <option>1</option><option selected>2</option><option>3</option><option>4</option>
+      <option>5</option><option>6</option><option>7</option><option>8</option>
+      <option>9</option><option>10</option><option>11</option><option>12</option>
+      <option>13</option><option>14</option><option>15</option><option>16</option>
+    </select>
+  </div>
+
+  <div class="kbs-field kbs-field--submit">
+    <button type="submit">Search</button>
+  </div>
+
+  <input type="hidden" name="arrival" data-kbs-arrival>
+  <input type="hidden" name="departure" data-kbs-departure>
+</form>
+
+<style>
+/* ---- widget shell ---- */
+.kbs-widget{
+  --kbs-brown:#9D6B2B;--kbs-brown-dark:#7d5522;--kbs-teal:#00333D;
+  --kbs-cream:#f0eadc;--kbs-ink:#00333D;
+  box-sizing:border-box;display:grid;gap:14px;grid-template-columns:1fr 1fr;
+  width:100%;max-width:380px;padding:20px;border-radius:16px;background:var(--kbs-teal);
+  border:1px solid rgba(255,255,255,.18);
+  font-family:"Trirong",Georgia,"Times New Roman",serif;
+}
+.kbs-widget *,.kbs-widget *::before,.kbs-widget *::after{box-sizing:border-box;}
+.kbs-widget .kbs-field--guests,
+.kbs-widget .kbs-field--submit{grid-column:1 / -1;}
+.kbs-field{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.kbs-field label{color:#fff;font-size:14px;font-weight:600;line-height:1;}
+.kbs-field input,.kbs-field select{
+  width:100%;height:44px;padding:0 12px;border-radius:12px;border:1px solid rgba(0,0,0,.12);
+  background:#fff;color:var(--kbs-ink);font:inherit;font-size:15px;
+  -webkit-appearance:none;appearance:none;cursor:pointer;
+}
+.kbs-field input.kbs-invalid{outline:2px solid #ef4444;outline-offset:1px;}
+.kbs-field select{
+  padding-right:34px;background-repeat:no-repeat;background-position:right 12px center;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%2300333D' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.kbs-field input:focus,.kbs-field select:focus{
+  outline:2px solid var(--kbs-brown);outline-offset:1px;border-color:var(--kbs-brown);
+}
+.kbs-field--submit button{
+  width:100%;height:46px;border:0;border-radius:12px;cursor:pointer;background:var(--kbs-brown);
+  color:#fff;font:inherit;font-size:16px;font-weight:700;transition:background .15s ease;
+}
+.kbs-field--submit button:hover{background:var(--kbs-brown-dark);}
+@media (max-width:360px){ .kbs-widget{grid-template-columns:1fr;padding:16px;} }
+
+/* ---- flatpickr calendar: one month, compact, always fits ---- */
+.flatpickr-calendar.kbs-fp{
+  max-width:calc(100vw - 24px);
+  border:1px solid rgba(0,51,61,.10);border-radius:14px;
+  box-shadow:0 16px 40px -12px rgba(0,51,61,.35);
+  font-family:"Trirong",Georgia,"Times New Roman",serif;font-size:14px;background:#fff;
+}
+.flatpickr-calendar.kbs-fp.open{z-index:99999;}
+.flatpickr-calendar.kbs-fp.arrowTop::before,.flatpickr-calendar.kbs-fp.arrowTop::after,
+.flatpickr-calendar.kbs-fp.arrowBottom::before,.flatpickr-calendar.kbs-fp.arrowBottom::after{display:none;}
+.kbs-fp .flatpickr-months{margin:.35rem 0 .2rem;}
+.kbs-fp .flatpickr-current-month{font-size:1.02rem;padding-top:3px;}
+.kbs-fp .flatpickr-months .flatpickr-month,.kbs-fp .flatpickr-current-month{color:#00333D;fill:#00333D;}
+.kbs-fp .flatpickr-months .flatpickr-prev-month,.kbs-fp .flatpickr-months .flatpickr-next-month{padding:5px 9px;}
+.kbs-fp .flatpickr-months .flatpickr-prev-month:hover svg,.kbs-fp .flatpickr-months .flatpickr-next-month:hover svg{fill:#9D6B2B;}
+.kbs-fp .flatpickr-weekdays{height:26px;}
+.kbs-fp span.flatpickr-weekday{font-size:.64rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:#94a3b8;}
+.kbs-fp .dayContainer{padding:2px 7px 8px;}
+.kbs-fp .flatpickr-day{max-width:40px;height:39px;line-height:38px;border-radius:8px;color:#00333D;font-weight:500;}
+.kbs-fp .flatpickr-day:hover,.kbs-fp .flatpickr-day:focus{background:#f0eadc;border-color:#f0eadc;}
+.kbs-fp .flatpickr-day.flatpickr-disabled,.kbs-fp .flatpickr-day.prevMonthDay,.kbs-fp .flatpickr-day.nextMonthDay{color:#cbd5e1;}
+.kbs-fp .flatpickr-day.selected,.kbs-fp .flatpickr-day.startRange,.kbs-fp .flatpickr-day.endRange,
+.kbs-fp .flatpickr-day.selected:hover,.kbs-fp .flatpickr-day.startRange:hover,.kbs-fp .flatpickr-day.endRange:hover{
+  background:#9D6B2B;border-color:#9D6B2B;color:#fff;box-shadow:none;
+}
+.kbs-fp .flatpickr-day.inRange{
+  background:#f0eadc;border-color:#f0eadc;border-radius:0;
+  box-shadow:-5px 0 0 #f0eadc,5px 0 0 #f0eadc;
+}
+.kbs-fp .flatpickr-day.startRange{border-radius:8px 0 0 8px;}
+.kbs-fp .flatpickr-day.endRange{border-radius:0 8px 8px 0;}
+.kbs-fp .flatpickr-day.startRange.endRange{border-radius:8px;}
+.kbs-fp .flatpickr-day.today{border-color:rgba(157,107,43,.4);}
+.kbs-fp .flatpickr-day.today:hover{background:#f0eadc;border-color:#9D6B2B;color:#00333D;}
+
+/* per-night prices */
+.flatpickr-calendar.kbs-fp.has-prices .flatpickr-day{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;height:46px;line-height:1.1;
+}
+.kbs-fp .flatpickr-day .kbs-fp-price{font-size:.6rem;font-weight:600;color:#94a3b8;letter-spacing:-.02em;margin-top:1px;}
+.kbs-fp .flatpickr-day.prevMonthDay .kbs-fp-price,.kbs-fp .flatpickr-day.nextMonthDay .kbs-fp-price{display:none;}
+.kbs-fp .flatpickr-day:hover .kbs-fp-price{color:#64748b;}
+.kbs-fp .flatpickr-day.selected .kbs-fp-price,.kbs-fp .flatpickr-day.startRange .kbs-fp-price,.kbs-fp .flatpickr-day.endRange .kbs-fp-price{color:rgba(255,255,255,.9);}
+.kbs-fp .flatpickr-day.inRange .kbs-fp-price{color:#7d5522;}
+.kbs-fp .kbs-fp-note{border-top:1px solid #f1f5f9;padding:.5rem .5rem .6rem;text-align:center;font-size:.64rem;color:#94a3b8;}
+@media (max-width:360px){
+  .kbs-fp .flatpickr-day{max-width:36px;height:37px;line-height:36px;}
+  .flatpickr-calendar.kbs-fp.has-prices .flatpickr-day{height:43px;}
+}
+</style>
+
+<script>
+(function () {
+  var FP_VER = '4.6.13';
+  var CDN    = 'https://cdnjs.cloudflare.com/ajax/libs/flatpickr/' + FP_VER;
+  var API    = 'https://bookings.karunasiargao.com/api/calendar';
+
+  function pad(n){ return String(n).padStart(2, '0'); }
+  function iso(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function parseISO(s){ var p = (s || '').split('-'); return p.length === 3 ? new Date(+p[0], +p[1] - 1, +p[2]) : null; }
+  function sameDay(a, b){ return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+  function addDays(d, n){ var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+
+  function loadCss(href){
+    if (document.querySelector('link[data-kbs-css="' + href + '"]')) return;
+    var l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = href; l.setAttribute('data-kbs-css', href);
+    document.head.appendChild(l);
+  }
+  function loadScript(src){
+    return new Promise(function (resolve, reject) {
+      var ex = document.querySelector('script[data-kbs-src="' + src + '"]');
+      if (ex) {
+        if (ex.getAttribute('data-kbs-done')) return resolve();
+        ex.addEventListener('load', function () { resolve(); });
+        ex.addEventListener('error', reject);
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = src; s.setAttribute('data-kbs-src', src);
+      s.onload = function () { s.setAttribute('data-kbs-done', '1'); resolve(); };
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  function wire(form){
+    if (form.dataset.kbsReady) return;
+    form.dataset.kbsReady = '1';
+
+    var checkin    = form.querySelector('[data-kbs-checkin]');
+    var checkout   = form.querySelector('[data-kbs-checkout]');
+    var arrival    = form.querySelector('[data-kbs-arrival]');
+    var departure  = form.querySelector('[data-kbs-departure]');
+    var showPrices = form.getAttribute('data-kbs-prices') !== 'off';
+
+    form.addEventListener('submit', function (e) {
+      if (!arrival.value || !departure.value) {
+        e.preventDefault();
+        checkin.classList.add('kbs-invalid');
+        return;
+      }
+      if (form.action.indexOf('#') === -1) form.action = form.action + '#rooms';
+    });
+
+    function fallback(){
+      var today = iso(new Date());
+      [checkin, checkout].forEach(function (i) { i.type = 'date'; i.readOnly = false; i.placeholder = ''; });
+      checkin.min = today;
+      checkout.min = iso(addDays(new Date(), 1));
+      checkin.value = arrival.value; checkout.value = departure.value;
+      function s(){ arrival.value = checkin.value; departure.value = checkout.value; }
+      checkin.addEventListener('change', function () {
+        if (checkin.value) {
+          var floor = iso(addDays(parseISO(checkin.value), 1));
+          checkout.min = floor;
+          if (!checkout.value || checkout.value < floor) checkout.value = floor;
+        }
+        s();
+      });
+      checkout.addEventListener('change', s);
+    }
+
+    loadCss(CDN + '/flatpickr.min.css');
+    loadScript(CDN + '/flatpickr.min.js')
+      .then(function () { return loadScript(CDN + '/plugins/rangePlugin.min.js'); })
+      .then(function () {
+        if (!showPrices) return {};
+        return fetch(API).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
+      })
+      .then(function (cal) { initPicker(cal || {}); })
+      .catch(fallback);
+
+    function initPicker(cal){
+      if (!window.flatpickr || !window.rangePlugin) { fallback(); return; }
+
+      var priceDays  = cal.days || {};
+      var priceCur   = cal.currency || 'PHP';
+      var keys       = Object.keys(priceDays).sort();
+      var lastPriced = keys.length ? keys[keys.length - 1] : null;
+      var havePrices = showPrices && !!lastPriced;
+      var sym = priceCur === 'PHP' ? '₱' : priceCur + ' ';
+      function fmtPrice(n){ return n >= 1000 ? sym + (Math.round(n / 100) / 10) + 'K' : sym + Math.round(n); }
+
+      function nightOpen(date){ if (!lastPriced) return true; var k = iso(date); return k > lastPriced || !!priceDays[k]; }
+      function reachableCheckout(ci, date){
+        for (var d = new Date(ci); d < date; d.setDate(d.getDate() + 1)) { if (!nightOpen(d)) return false; }
+        return true;
+      }
+      function blockUnavailable(date){ return !nightOpen(date); }
+
+      var setting = false;
+      function syncDisable(fp, dates){
+        if (setting) return;
+        var ci = dates[0];
+        var picking = dates.length === 1;
+        var rule = ci
+          ? function (date) {
+              if (picking && sameDay(date, ci)) return true;
+              return date <= ci ? blockUnavailable(date) : !reachableCheckout(ci, date);
+            }
+          : blockUnavailable;
+        setting = true; fp.set('disable', [rule]); setting = false;
+      }
+      function sync(dates){
+        arrival.value = dates[0] ? iso(dates[0]) : '';
+        departure.value = dates[1] ? iso(dates[1]) : '';
+      }
+
+      var pre = [parseISO(arrival.value), parseISO(departure.value)].filter(Boolean);
+
+      window.flatpickr(checkin, {
+        mode: 'range',
+        showMonths: 1,
+        minDate: 'today',
+        dateFormat: 'D, M j',
+        defaultDate: pre.length === 2 ? pre : null,
+        plugins: [ new window.rangePlugin({ input: checkout }) ],
+        disable: [ blockUnavailable ],
+        onChange: function (dates, str, fp) {
+          sync(dates); syncDisable(fp, dates);
+          checkin.classList.remove('kbs-invalid');
+        },
+        onReady: function (dates, str, fp) {
+          sync(dates); syncDisable(fp, dates);
+          fp.calendarContainer.classList.add('kbs-fp');
+          if (havePrices) {
+            fp.calendarContainer.classList.add('has-prices');
+            var note = document.createElement('div');
+            note.className = 'kbs-fp-note';
+            note.textContent = 'Nightly prices in ' + priceCur + ' · lowest available room';
+            fp.calendarContainer.appendChild(note);
+          }
+        },
+        onDayCreate: function (dates, str, fp, dayElem) {
+          if (!havePrices) return;
+          if (dayElem.classList.contains('flatpickr-disabled')) return;
+          var price = priceDays[iso(dayElem.dateObj)];
+          if (!price) return;
+          var tag = document.createElement('span');
+          tag.className = 'kbs-fp-price';
+          tag.textContent = fmtPrice(price);
+          dayElem.appendChild(tag);
+        }
+      });
+    }
+  }
+
+  function init(){ document.querySelectorAll('form[data-kbs]').forEach(wire); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>

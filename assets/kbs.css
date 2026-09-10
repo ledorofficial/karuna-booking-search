@@ -1,0 +1,85 @@
+/* ---- widget shell ---- */
+.kbs-widget{
+  --kbs-brown:#9D6B2B;--kbs-brown-dark:#7d5522;--kbs-teal:#00333D;
+  --kbs-cream:#f0eadc;--kbs-ink:#00333D;
+  box-sizing:border-box;display:grid;gap:14px;grid-template-columns:1fr 1fr;
+  width:100%;max-width:380px;padding:20px;border-radius:16px;background:var(--kbs-teal);
+  border:1px solid rgba(255,255,255,.18);
+  font-family:"Trirong",Georgia,"Times New Roman",serif;
+}
+.kbs-widget *,.kbs-widget *::before,.kbs-widget *::after{box-sizing:border-box;}
+.kbs-widget .kbs-field--guests,
+.kbs-widget .kbs-field--submit{grid-column:1 / -1;}
+.kbs-field{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.kbs-field label{color:#fff;font-size:14px;font-weight:600;line-height:1;}
+.kbs-field input,.kbs-field select{
+  width:100%;height:44px;padding:0 12px;border-radius:12px;border:1px solid rgba(0,0,0,.12);
+  background:#fff;color:var(--kbs-ink);font:inherit;font-size:15px;
+  -webkit-appearance:none;appearance:none;cursor:pointer;
+}
+.kbs-field input.kbs-invalid{outline:2px solid #ef4444;outline-offset:1px;}
+.kbs-field select{
+  padding-right:34px;background-repeat:no-repeat;background-position:right 12px center;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%2300333D' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.kbs-field input:focus,.kbs-field select:focus{
+  outline:2px solid var(--kbs-brown);outline-offset:1px;border-color:var(--kbs-brown);
+}
+.kbs-field--submit button{
+  width:100%;height:46px;border:0;border-radius:12px;cursor:pointer;background:var(--kbs-brown);
+  color:#fff;font:inherit;font-size:16px;font-weight:700;transition:background .15s ease;
+}
+.kbs-field--submit button:hover{background:var(--kbs-brown-dark);}
+@media (max-width:360px){
+  .kbs-widget{grid-template-columns:1fr;padding:16px;}
+}
+
+/* ---- flatpickr calendar: one month, compact, always fits ---- */
+.flatpickr-calendar.kbs-fp{
+  max-width:calc(100vw - 24px);
+  border:1px solid rgba(0,51,61,.10);border-radius:14px;
+  box-shadow:0 16px 40px -12px rgba(0,51,61,.35);
+  font-family:"Trirong",Georgia,"Times New Roman",serif;font-size:14px;background:#fff;
+}
+.flatpickr-calendar.kbs-fp.open{z-index:99999;}
+.flatpickr-calendar.kbs-fp.arrowTop::before,.flatpickr-calendar.kbs-fp.arrowTop::after,
+.flatpickr-calendar.kbs-fp.arrowBottom::before,.flatpickr-calendar.kbs-fp.arrowBottom::after{display:none;}
+.kbs-fp .flatpickr-months{margin:.35rem 0 .2rem;}
+.kbs-fp .flatpickr-current-month{font-size:1.02rem;padding-top:3px;}
+.kbs-fp .flatpickr-months .flatpickr-month,.kbs-fp .flatpickr-current-month{color:#00333D;fill:#00333D;}
+.kbs-fp .flatpickr-months .flatpickr-prev-month,.kbs-fp .flatpickr-months .flatpickr-next-month{padding:5px 9px;}
+.kbs-fp .flatpickr-months .flatpickr-prev-month:hover svg,.kbs-fp .flatpickr-months .flatpickr-next-month:hover svg{fill:#9D6B2B;}
+.kbs-fp .flatpickr-weekdays{height:26px;}
+.kbs-fp span.flatpickr-weekday{font-size:.64rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:#94a3b8;}
+.kbs-fp .dayContainer{padding:2px 7px 8px;}
+.kbs-fp .flatpickr-day{max-width:40px;height:39px;line-height:38px;border-radius:8px;color:#00333D;font-weight:500;}
+.kbs-fp .flatpickr-day:hover,.kbs-fp .flatpickr-day:focus{background:#f0eadc;border-color:#f0eadc;}
+.kbs-fp .flatpickr-day.flatpickr-disabled,.kbs-fp .flatpickr-day.prevMonthDay,.kbs-fp .flatpickr-day.nextMonthDay{color:#cbd5e1;}
+.kbs-fp .flatpickr-day.selected,.kbs-fp .flatpickr-day.startRange,.kbs-fp .flatpickr-day.endRange,
+.kbs-fp .flatpickr-day.selected:hover,.kbs-fp .flatpickr-day.startRange:hover,.kbs-fp .flatpickr-day.endRange:hover{
+  background:#9D6B2B;border-color:#9D6B2B;color:#fff;box-shadow:none;
+}
+.kbs-fp .flatpickr-day.inRange{
+  background:#f0eadc;border-color:#f0eadc;border-radius:0;
+  box-shadow:-5px 0 0 #f0eadc,5px 0 0 #f0eadc;
+}
+.kbs-fp .flatpickr-day.startRange{border-radius:8px 0 0 8px;}
+.kbs-fp .flatpickr-day.endRange{border-radius:0 8px 8px 0;}
+.kbs-fp .flatpickr-day.startRange.endRange{border-radius:8px;}
+.kbs-fp .flatpickr-day.today{border-color:rgba(157,107,43,.4);}
+.kbs-fp .flatpickr-day.today:hover{background:#f0eadc;border-color:#9D6B2B;color:#00333D;}
+
+/* per-night prices (added only when data-kbs-prices != "off") */
+.flatpickr-calendar.kbs-fp.has-prices .flatpickr-day{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;height:46px;line-height:1.1;
+}
+.kbs-fp .flatpickr-day .kbs-fp-price{font-size:.6rem;font-weight:600;color:#94a3b8;letter-spacing:-.02em;margin-top:1px;}
+.kbs-fp .flatpickr-day.prevMonthDay .kbs-fp-price,.kbs-fp .flatpickr-day.nextMonthDay .kbs-fp-price{display:none;}
+.kbs-fp .flatpickr-day:hover .kbs-fp-price{color:#64748b;}
+.kbs-fp .flatpickr-day.selected .kbs-fp-price,.kbs-fp .flatpickr-day.startRange .kbs-fp-price,.kbs-fp .flatpickr-day.endRange .kbs-fp-price{color:rgba(255,255,255,.9);}
+.kbs-fp .flatpickr-day.inRange .kbs-fp-price{color:#7d5522;}
+.kbs-fp .kbs-fp-note{border-top:1px solid #f1f5f9;padding:.5rem .5rem .6rem;text-align:center;font-size:.64rem;color:#94a3b8;}
+@media (max-width:360px){
+  .kbs-fp .flatpickr-day{max-width:36px;height:37px;line-height:36px;}
+  .flatpickr-calendar.kbs-fp.has-prices .flatpickr-day{height:43px;}
+}
