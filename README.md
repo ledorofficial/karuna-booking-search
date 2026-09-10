@@ -21,10 +21,14 @@ https://bookings.karunasiargao.com/?arrival=YYYY-MM-DD&departure=YYYY-MM-DD&gues
 
 ## Updates
 
-The plugin checks this repo for new versions. When `main` has a higher
-`Version:` than what's installed, WordPress shows the normal **update available**
-notice in *Plugins* and updates with one click — no re-upload. (Force a check
-with *Plugins → check for updates*, or it runs automatically every ~12h.)
+The plugin checks this repo's **[Releases](../../releases)**. When a release has a
+higher version than what's installed, WordPress shows the normal **update
+available** notice in *Plugins* and updates with one click — no re-upload.
+(WordPress checks automatically every ~12h; force it from *Dashboard → Updates →
+Check again*.)
+
+Shipping an update = bump the `Version:` header in `karuna-booking-search.php`,
+push, and publish a GitHub release tagged `vX.Y.Z`.
 
 Uses [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker)
 (bundled in `plugin-update-checker/`). Works token-free while this repo is public.
