@@ -3,7 +3,7 @@
  * Plugin Name:       Karuna Booking Search
  * Plugin URI:        https://github.com/ledorofficial/karuna-booking-search
  * Description:        Branded availability search (replaces the Smoobu widget). A compact one-month calendar with live nightly prices and sold-out nights greyed out, pulled from bookings.karunasiargao.com, then sends the search there. Use [karuna_booking_search] or the "Karuna Booking Search" widget.
- * Version:           1.4.0
+ * Version:           1.5.0
  * Author:            Karuna Siargao
  * License:           GPL-2.0-or-later
  * Text Domain:       karuna-booking-search
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const KBS_VERSION      = '1.4.0';
+const KBS_VERSION      = '1.5.0';
 const KBS_FLATPICKR    = '4.6.13';
 const KBS_DEFAULT_BASE = 'https://bookings.karunasiargao.com/';
 const KBS_CALENDAR_API = 'https://bookings.karunasiargao.com/api/calendar';
@@ -79,12 +79,26 @@ function kbs_render_widget($atts = []): string
                    placeholder="Add date" autocomplete="off" readonly data-kbs-checkout>
         </div>
         <div class="kbs-field kbs-field--guests">
-            <label for="<?php echo esc_attr($uid); ?>-guests">People</label>
-            <select id="<?php echo esc_attr($uid); ?>-guests" name="guests">
-                <?php for ($i = 1; $i <= $max_guests; $i++) : ?>
-                    <option value="<?php echo esc_attr($i); ?>"<?php echo $i === 2 ? ' selected' : ''; ?>><?php echo esc_html($i); ?></option>
-                <?php endfor; ?>
-            </select>
+            <label>Guests</label>
+            <details class="kbs-guests">
+                <summary>
+                    <span data-kbs-guests-label>2 guests</span>
+                    <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                </summary>
+                <div class="kbs-guests-pop">
+                    <?php foreach ([['adults', 'Adults', 2], ['children', 'Children', 0]] as [$k, $lbl, $start]) : ?>
+                        <div class="kbs-guests-row">
+                            <span><?php echo esc_html($lbl); ?></span>
+                            <span class="kbs-stepper">
+                                <button type="button" data-kbs-step="-1" data-kbs-target="<?php echo esc_attr($k); ?>" aria-label="Fewer <?php echo esc_attr($lbl); ?>">&minus;</button>
+                                <span data-kbs-val="<?php echo esc_attr($k); ?>"><?php echo (int) $start; ?></span>
+                                <button type="button" data-kbs-step="1" data-kbs-target="<?php echo esc_attr($k); ?>" aria-label="More <?php echo esc_attr($lbl); ?>">+</button>
+                            </span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </details>
+            <input type="hidden" name="guests" value="2" data-kbs-guests data-kbs-max="<?php echo esc_attr($max_guests); ?>">
         </div>
         <div class="kbs-field kbs-field--submit">
             <button type="submit"><?php echo esc_html($button); ?></button>
@@ -192,7 +206,7 @@ class KBS_Widget extends WP_Widget
                    value="<?php echo esc_attr($button); ?>" placeholder="Search">
         </p>
         <p>
-            <label for="<?php echo esc_attr($this->get_field_id('max_guests')); ?>">Max people in dropdown:</label>
+            <label for="<?php echo esc_attr($this->get_field_id('max_guests')); ?>">Max guests (Adults + Children):</label>
             <input class="tiny-text" id="<?php echo esc_attr($this->get_field_id('max_guests')); ?>"
                    name="<?php echo esc_attr($this->get_field_name('max_guests')); ?>" type="number" min="1" max="99"
                    value="<?php echo esc_attr($max_guests); ?>">

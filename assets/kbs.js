@@ -7,9 +7,59 @@
   function sameDay(a, b){ return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
   function addDays(d, n){ var x = new Date(d); x.setDate(x.getDate() + n); return x; }
 
+  // Adults / children stepper -> single hidden "guests" total.
+  function wireGuests(form){
+    var box = form.querySelector('.kbs-guests');
+    var hidden = form.querySelector('[data-kbs-guests]');
+    if (!box || !hidden) return;
+
+    var labelEl = box.querySelector('[data-kbs-guests-label]');
+    var max = parseInt(hidden.getAttribute('data-kbs-max') || '16', 10) || 16;
+    var valEl = {
+      adults: box.querySelector('[data-kbs-val="adults"]'),
+      children: box.querySelector('[data-kbs-val="children"]')
+    };
+    var vals = {
+      adults: Math.max(1, parseInt(valEl.adults.textContent, 10) || 1),
+      children: Math.max(0, parseInt(valEl.children.textContent, 10) || 0)
+    };
+
+    function render(){
+      var total = vals.adults + vals.children;
+      valEl.adults.textContent = vals.adults;
+      valEl.children.textContent = vals.children;
+      hidden.value = total;
+      if (labelEl) labelEl.textContent = total + (total === 1 ? ' guest' : ' guests');
+      box.querySelectorAll('[data-kbs-step]').forEach(function (btn) {
+        var t = btn.getAttribute('data-kbs-target');
+        var down = parseInt(btn.getAttribute('data-kbs-step'), 10) < 0;
+        btn.disabled = down ? vals[t] <= (t === 'adults' ? 1 : 0) : total >= max;
+      });
+    }
+
+    box.querySelectorAll('[data-kbs-step]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var t = btn.getAttribute('data-kbs-target');
+        var dir = parseInt(btn.getAttribute('data-kbs-step'), 10);
+        var floor = t === 'adults' ? 1 : 0;
+        if (dir < 0 && vals[t] <= floor) return;
+        if (dir > 0 && (vals.adults + vals.children) >= max) return;
+        vals[t] += dir;
+        render();
+      });
+    });
+    document.addEventListener('click', function (e) {
+      if (box.open && !box.contains(e.target)) box.open = false;
+    });
+    render();
+  }
+
   function wire(form){
     if (form.dataset.kbsReady) return;
     form.dataset.kbsReady = '1';
+
+    wireGuests(form);
 
     var checkin    = form.querySelector('[data-kbs-checkin]');
     var checkout   = form.querySelector('[data-kbs-checkout]');

@@ -39,7 +39,7 @@ Uses [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checke
 |--------------|--------------------------------------|---------------------------------------------------|
 | `base`       | `https://bookings.karunasiargao.com/`| Where the search submits.                          |
 | `target`     | `_self`                              | `_blank` opens results in a new tab.               |
-| `max_guests` | `16`                                 | Highest number in the People dropdown.             |
+| `max_guests` | `16`                                 | Ceiling for Adults + Children in the Guests picker.|
 | `prices`     | `on`                                 | `off` hides the per-night prices.                  |
 | `layout`     | `stacked`                            | `stacked` = teal card; `inline` = light wide row.  |
 | `button`     | `Search`                             | Submit button label.                              |

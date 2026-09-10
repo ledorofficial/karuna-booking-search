@@ -28,14 +28,34 @@
     <input type="text" id="kbs-checkout" placeholder="Add date" autocomplete="off" readonly data-kbs-checkout>
   </div>
 
+  <!-- change data-kbs-max below to cap the guest count -->
   <div class="kbs-field kbs-field--guests">
-    <label for="kbs-guests">People</label>
-    <select id="kbs-guests" name="guests">
-      <option>1</option><option selected>2</option><option>3</option><option>4</option>
-      <option>5</option><option>6</option><option>7</option><option>8</option>
-      <option>9</option><option>10</option><option>11</option><option>12</option>
-      <option>13</option><option>14</option><option>15</option><option>16</option>
-    </select>
+    <label>Guests</label>
+    <details class="kbs-guests">
+      <summary>
+        <span data-kbs-guests-label>2 guests</span>
+        <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      </summary>
+      <div class="kbs-guests-pop">
+        <div class="kbs-guests-row">
+          <span>Adults</span>
+          <span class="kbs-stepper">
+            <button type="button" data-kbs-step="-1" data-kbs-target="adults" aria-label="Fewer adults">&minus;</button>
+            <span data-kbs-val="adults">2</span>
+            <button type="button" data-kbs-step="1" data-kbs-target="adults" aria-label="More adults">+</button>
+          </span>
+        </div>
+        <div class="kbs-guests-row">
+          <span>Children</span>
+          <span class="kbs-stepper">
+            <button type="button" data-kbs-step="-1" data-kbs-target="children" aria-label="Fewer children">&minus;</button>
+            <span data-kbs-val="children">0</span>
+            <button type="button" data-kbs-step="1" data-kbs-target="children" aria-label="More children">+</button>
+          </span>
+        </div>
+      </div>
+    </details>
+    <input type="hidden" name="guests" value="2" data-kbs-guests data-kbs-max="16">
   </div>
 
   <div class="kbs-field kbs-field--submit">
@@ -96,7 +116,37 @@
   .kbs-widget--inline{grid-template-columns:1fr 1fr;}
   .kbs-widget--inline .kbs-field--guests,.kbs-widget--inline .kbs-field--submit{grid-column:1 / -1;}
   .kbs-widget--inline .kbs-field--submit button{width:100%;}
+  .kbs-widget--inline .kbs-guests-pop{right:0;min-width:0;}
 }
+
+/* ---- guests: adults / children stepper popover ---- */
+.kbs-guests{position:relative;}
+.kbs-guests > summary{
+  list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  height:44px;padding:0 12px;border-radius:12px;border:1px solid rgba(0,0,0,.12);
+  background:#fff;color:var(--kbs-ink);font:inherit;font-size:15px;cursor:pointer;
+}
+.kbs-guests > summary::-webkit-details-marker{display:none;}
+.kbs-guests > summary svg{width:12px;height:12px;flex:none;opacity:.6;}
+.kbs-guests[open] > summary{outline:2px solid var(--kbs-brown);outline-offset:1px;border-color:var(--kbs-brown);}
+.kbs-guests-pop{
+  position:absolute;z-index:99998;left:0;right:0;margin-top:8px;padding:6px 14px;
+  background:#fff;border:1px solid rgba(0,51,61,.12);border-radius:14px;
+  box-shadow:0 16px 40px -12px rgba(0,51,61,.35);
+}
+.kbs-widget--inline .kbs-guests-pop{right:auto;min-width:230px;}
+.kbs-guests-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0;}
+.kbs-guests-row + .kbs-guests-row{border-top:1px solid #f1f5f9;}
+.kbs-guests-row > span:first-child{font-size:14px;font-weight:500;color:var(--kbs-ink);}
+.kbs-stepper{display:flex;align-items:center;gap:10px;}
+.kbs-stepper button{
+  width:32px;height:32px;flex:none;border-radius:999px;border:1px solid rgba(0,51,61,.25);
+  background:#fff;color:var(--kbs-ink);font:inherit;font-size:17px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:border-color .12s,color .12s;
+}
+.kbs-stepper button:hover:not(:disabled){border-color:var(--kbs-brown);color:var(--kbs-brown);}
+.kbs-stepper button:disabled{opacity:.35;cursor:not-allowed;}
+.kbs-stepper > span{min-width:16px;text-align:center;font-size:14px;font-variant-numeric:tabular-nums;}
 
 /* ---- flatpickr calendar: one month, compact, always fits ---- */
 .flatpickr-calendar.kbs-fp{
@@ -184,9 +234,59 @@
     });
   }
 
+  // Adults / children stepper -> single hidden "guests" total.
+  function wireGuests(form){
+    var box = form.querySelector('.kbs-guests');
+    var hidden = form.querySelector('[data-kbs-guests]');
+    if (!box || !hidden) return;
+
+    var labelEl = box.querySelector('[data-kbs-guests-label]');
+    var max = parseInt(hidden.getAttribute('data-kbs-max') || '16', 10) || 16;
+    var valEl = {
+      adults: box.querySelector('[data-kbs-val="adults"]'),
+      children: box.querySelector('[data-kbs-val="children"]')
+    };
+    var vals = {
+      adults: Math.max(1, parseInt(valEl.adults.textContent, 10) || 1),
+      children: Math.max(0, parseInt(valEl.children.textContent, 10) || 0)
+    };
+
+    function render(){
+      var total = vals.adults + vals.children;
+      valEl.adults.textContent = vals.adults;
+      valEl.children.textContent = vals.children;
+      hidden.value = total;
+      if (labelEl) labelEl.textContent = total + (total === 1 ? ' guest' : ' guests');
+      box.querySelectorAll('[data-kbs-step]').forEach(function (btn) {
+        var t = btn.getAttribute('data-kbs-target');
+        var down = parseInt(btn.getAttribute('data-kbs-step'), 10) < 0;
+        btn.disabled = down ? vals[t] <= (t === 'adults' ? 1 : 0) : total >= max;
+      });
+    }
+
+    box.querySelectorAll('[data-kbs-step]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var t = btn.getAttribute('data-kbs-target');
+        var dir = parseInt(btn.getAttribute('data-kbs-step'), 10);
+        var floor = t === 'adults' ? 1 : 0;
+        if (dir < 0 && vals[t] <= floor) return;
+        if (dir > 0 && (vals.adults + vals.children) >= max) return;
+        vals[t] += dir;
+        render();
+      });
+    });
+    document.addEventListener('click', function (e) {
+      if (box.open && !box.contains(e.target)) box.open = false;
+    });
+    render();
+  }
+
   function wire(form){
     if (form.dataset.kbsReady) return;
     form.dataset.kbsReady = '1';
+
+    wireGuests(form);
 
     var checkin    = form.querySelector('[data-kbs-checkin]');
     var checkout   = form.querySelector('[data-kbs-checkout]');

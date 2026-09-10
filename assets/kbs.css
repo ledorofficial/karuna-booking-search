@@ -52,7 +52,37 @@
   .kbs-widget--inline .kbs-field--guests,
   .kbs-widget--inline .kbs-field--submit{grid-column:1 / -1;}
   .kbs-widget--inline .kbs-field--submit button{width:100%;}
+  .kbs-widget--inline .kbs-guests-pop{right:0;min-width:0;}
 }
+
+/* ---- guests: adults / children stepper popover ---- */
+.kbs-guests{position:relative;}
+.kbs-guests > summary{
+  list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  height:44px;padding:0 12px;border-radius:12px;border:1px solid rgba(0,0,0,.12);
+  background:#fff;color:var(--kbs-ink);font:inherit;font-size:15px;cursor:pointer;
+}
+.kbs-guests > summary::-webkit-details-marker{display:none;}
+.kbs-guests > summary svg{width:12px;height:12px;flex:none;opacity:.6;}
+.kbs-guests[open] > summary{outline:2px solid var(--kbs-brown);outline-offset:1px;border-color:var(--kbs-brown);}
+.kbs-guests-pop{
+  position:absolute;z-index:99998;left:0;right:0;margin-top:8px;padding:6px 14px;
+  background:#fff;border:1px solid rgba(0,51,61,.12);border-radius:14px;
+  box-shadow:0 16px 40px -12px rgba(0,51,61,.35);
+}
+.kbs-widget--inline .kbs-guests-pop{right:auto;min-width:230px;}
+.kbs-guests-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0;}
+.kbs-guests-row + .kbs-guests-row{border-top:1px solid #f1f5f9;}
+.kbs-guests-row > span:first-child{font-size:14px;font-weight:500;color:var(--kbs-ink);}
+.kbs-stepper{display:flex;align-items:center;gap:10px;}
+.kbs-stepper button{
+  width:32px;height:32px;flex:none;border-radius:999px;border:1px solid rgba(0,51,61,.25);
+  background:#fff;color:var(--kbs-ink);font:inherit;font-size:17px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:border-color .12s,color .12s;
+}
+.kbs-stepper button:hover:not(:disabled){border-color:var(--kbs-brown);color:var(--kbs-brown);}
+.kbs-stepper button:disabled{opacity:.35;cursor:not-allowed;}
+.kbs-stepper > span{min-width:16px;text-align:center;font-size:14px;font-variant-numeric:tabular-nums;}
 
 /* ---- flatpickr calendar: one month, compact, always fits ---- */
 .flatpickr-calendar.kbs-fp{
