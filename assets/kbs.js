@@ -126,10 +126,8 @@
       function syncDisable(fp, dates){
         if (setting) return;
         var ci = dates[0];
-        var picking = dates.length === 1;
         var rule = ci
           ? function (date) {
-              if (picking && sameDay(date, ci)) return true; // no zero-night stays
               return date <= ci ? blockUnavailable(date) : !reachableCheckout(ci, date);
             }
           : blockUnavailable;
