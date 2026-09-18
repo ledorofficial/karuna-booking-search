@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       Karuna Booking Search
  * Plugin URI:        https://github.com/ledorofficial/karuna-booking-search
- * Description:        Branded availability search (replaces the Smoobu widget). A compact one-month calendar with live nightly prices and sold-out nights greyed out, pulled from bookings.karunasiargao.com, then sends the search there. Use [karuna_booking_search] or the "Karuna Booking Search" widget.
- * Version:           1.6.2
+ * Description:        Branded availability search and per-room calendar (replaces the Smoobu widgets). A compact one-month search calendar with live nightly prices, plus a read-only per-room calendar, both pulled from bookings.karunasiargao.com. Use [karuna_booking_search], [karuna_room_calendar], or the "Karuna Booking Search" widget.
+ * Version:           1.7.0
  * Author:            Karuna Siargao
  * License:           GPL-2.0-or-later
  * Text Domain:       karuna-booking-search
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const KBS_VERSION      = '1.6.2';
+const KBS_VERSION      = '1.7.0';
 const KBS_FLATPICKR    = '4.6.13';
 const KBS_DEFAULT_BASE = 'https://bookings.karunasiargao.com/';
 const KBS_CALENDAR_API = 'https://bookings.karunasiargao.com/api/calendar';
@@ -137,6 +137,64 @@ function kbs_enqueue_assets(): void
         '__KBS_API__',
         esc_url_raw(KBS_CALENDAR_API),
         kbs_asset('kbs.js')
+    ));
+}
+
+/**
+ * Render a single room's own availability calendar (branded replacement for
+ * Smoobu's embeddable per-apartment calendar iframe). Read-only: shows a
+ * couple of months with sold-out nights shaded, no date picking or form.
+ *
+ * @param array<string,mixed> $atts
+ */
+function kbs_render_room_calendar($atts = []): string
+{
+    $atts = shortcode_atts([
+        'room_id' => '',
+        'months'  => 6,
+        'base'    => KBS_DEFAULT_BASE,
+    ], $atts, 'karuna_room_calendar');
+
+    $roomId = (int) $atts['room_id'];
+    if ($roomId <= 0) {
+        return '';
+    }
+    $months = max(2, min(12, (int) $atts['months']));
+    $base   = esc_url($atts['base']);
+    $uid    = 'kbs-room-' . wp_generate_password(6, false, false);
+
+    kbs_enqueue_room_calendar_assets();
+
+    return sprintf(
+        '<div class="kbs-room-cal" id="%1$s" data-kbs-room data-room-id="%2$d" data-months="%3$d" data-base="%4$s"><div class="kbs-room-cal-months"></div></div>',
+        esc_attr($uid),
+        $roomId,
+        $months,
+        esc_attr($base)
+    );
+}
+
+add_shortcode('karuna_room_calendar', 'kbs_render_room_calendar');
+
+/** Register the room-calendar's own inline CSS/JS (no flatpickr needed — read-only grid). */
+function kbs_enqueue_room_calendar_assets(): void
+{
+    static $done = false;
+    if ($done) {
+        return;
+    }
+    $done = true;
+
+    wp_register_style('kbs-room-calendar', false, [], KBS_VERSION);
+    wp_enqueue_style('kbs-room-calendar');
+    wp_add_inline_style('kbs-room-calendar', kbs_asset('kbs-room.css'));
+
+    wp_register_script('kbs-room-calendar', false, [], KBS_VERSION, true);
+    wp_enqueue_script('kbs-room-calendar');
+    wp_add_inline_script('kbs-room-calendar', str_replace(
+        '__KBS_API__',
+        esc_url_raw(KBS_DEFAULT_BASE),
+        kbs_asset('kbs-room.js')
     ));
 }
 

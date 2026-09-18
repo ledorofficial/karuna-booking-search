@@ -1,0 +1,44 @@
+.kbs-room-cal{
+  --kbs-brown:#9D6B2B;--kbs-teal:#00333D;--kbs-ink:#00333D;--kbs-off:#f4c7c4;
+  box-sizing:border-box;background:#fff;border-radius:16px;padding:28px 32px 24px;
+  box-shadow:0 16px 40px -14px rgba(0,51,61,.28);
+  font-family:"Trirong",Georgia,"Times New Roman",serif;color:var(--kbs-ink);
+  max-width:760px;width:100%;
+}
+.kbs-room-cal *,.kbs-room-cal *::before,.kbs-room-cal *::after{box-sizing:border-box;}
+.kbs-room-cal-months{display:grid;grid-template-columns:1fr 1fr;gap:36px;}
+@media (max-width:620px){ .kbs-room-cal-months{grid-template-columns:1fr;} }
+
+.kbs-room-cal-month-head{position:relative;text-align:center;margin-bottom:14px;}
+.kbs-room-cal-month-head .y{font-size:.78rem;color:#7d8b90;letter-spacing:.04em;}
+.kbs-room-cal-month-head .m{
+  font-size:1.05rem;font-weight:700;letter-spacing:.03em;color:var(--kbs-brown);text-transform:uppercase;
+}
+
+.kbs-room-cal-nav{
+  position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:999px;
+  border:1px solid rgba(0,51,61,.25);background:#fff;color:var(--kbs-ink);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;padding:0;
+  transition:border-color .12s,color .12s;
+}
+.kbs-room-cal-nav:hover{border-color:var(--kbs-brown);color:var(--kbs-brown);}
+.kbs-room-cal-nav.prev{left:-2px;}
+.kbs-room-cal-nav.next{right:-2px;}
+
+.kbs-room-cal-week,.kbs-room-cal-days{display:grid;grid-template-columns:repeat(7,1fr);}
+.kbs-room-cal-week{margin-bottom:6px;}
+.kbs-room-cal-week span{
+  text-align:center;font-size:.66rem;font-weight:700;letter-spacing:.03em;color:#8a97a0;
+  padding-bottom:4px;text-transform:uppercase;
+}
+.kbs-room-cal-days .d{
+  position:relative;text-align:center;padding:9px 0;margin:1px 0;font-size:.86rem;color:var(--kbs-ink);
+  font-variant-numeric:tabular-nums;
+}
+.kbs-room-cal-days .d.blank{visibility:hidden;}
+.kbs-room-cal-days .d.off{background:var(--kbs-off);border-radius:6px;color:#8a5a54;}
+.kbs-room-cal-days .d.turnover{
+  border-radius:6px;
+  background:linear-gradient(135deg, var(--kbs-off) 0 50%, transparent 50.5% 100%);
+}
+.kbs-room-cal-days .d.today{outline:2px solid var(--kbs-teal);outline-offset:-2px;border-radius:6px;}
