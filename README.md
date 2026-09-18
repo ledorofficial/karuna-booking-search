@@ -27,8 +27,10 @@ available** notice in *Plugins* and updates with one click — no re-upload.
 (WordPress checks automatically every ~12h; force it from *Dashboard → Updates →
 Check again*.)
 
-Shipping an update = bump the `Version:` header in `karuna-booking-search.php`,
-push, and publish a GitHub release tagged `vX.Y.Z`.
+Shipping an update = bump the `Version:` header in `karuna-booking-search.php`
+and push to `main`. A GitHub Actions workflow
+(`.github/workflows/release.yml`) then tags and publishes the matching
+`vX.Y.Z` release with a zip automatically — no manual release step needed.
 
 Uses [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker)
 (bundled in `plugin-update-checker/`). Works token-free while this repo is public.
